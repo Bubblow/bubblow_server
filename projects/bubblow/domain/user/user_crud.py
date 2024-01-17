@@ -7,9 +7,8 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def get_user(db: Session, username: str):
+def get_user(username: str, db: Session):
     return db.query(User).filter(User.username == username).first()
-
 
 def create_user(new_user: NewUserForm, db: Session):
     user = User(

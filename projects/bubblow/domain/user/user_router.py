@@ -5,19 +5,17 @@ from sqlalchemy.orm import Session
 from database import get_db
 
 from fastapi import APIRouter, Depends, status, HTTPException, Response, Request
+from datetime import datetime, timedelta
+from typing import Union
 from domain.user import user_schema, user_crud
 
 from fastapi.security import OAuth2PasswordRequestForm
-
-from datetime import datetime, timedelta
 from jose import jwt
-from typing import Union
 
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-
 
 app = APIRouter(
     prefix="/user"
@@ -46,9 +44,10 @@ async def signup(new_user: user_schema.NewUserForm, db: Session = Depends(get_db
         
     return HTTPException(status_code=status.HTTP_200_OK, detail="Signup successful")
 
+
 @app.post(path="/login")
 async def login(response: Response, login_form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = user_crud.get_user(db, login_form.username)
+    user = user_crud.get_user(login_form.username, db)
     
     if not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid user or password")
