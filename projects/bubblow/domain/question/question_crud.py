@@ -5,7 +5,6 @@ from domain.question.question_schema import Link
 from datetime import datetime
 from feature import Feature
 
-#LinkList
 import sys, json
 sys.path.append('/Users/hansol/desktop (2)/Bubblow/nt-worker')
 from Analysis.AnalysisContents import AnalysisContent
@@ -28,11 +27,9 @@ def insert_answer(link: str, db: Session):
     answer = Question(link=link, content=content, create_date=datetime.utcnow())
     db.add(answer)
     db.commit()
-    
-    return answer
+    return {"content": answer.content}
 
 def list_all_link(db: Session):
     contents = db.query(Question.content).all()
     print(contents)
     return [content[0] for content in contents]
-    # [LinkList(id=row.id, link=row.link, date=row.date) for row in lists]
