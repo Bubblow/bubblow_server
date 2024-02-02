@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from models import Question
+from models import Question, User
 from datetime import datetime
 from feature import Feature
 
@@ -12,7 +12,7 @@ from Analysis.AnalysisTitle import AnalysisTitle
 from Analysis.AnalysisScore import AnalysisScore
 
 
-def insert_answer(link: str, db: Session):
+def insert_answer(link: str, user: User, db: Session):
     newsBuffer = Feature(link)
     at = AnalysisTitle(newsBuffer[0]['title'])
     at.PrintMyValue()
@@ -23,7 +23,7 @@ def insert_answer(link: str, db: Session):
     Vanilla = analysis_score.Vanilla
     analysis_score.PrintMyValue()
     content=json.dumps(Journal)
-    answer = Question(link=link, content=content, create_date=datetime.utcnow())
+    answer = Question(link=link, content=content, create_date=datetime.utcnow(), user=user)
     db.add(answer)
     db.commit()
     return {"content": answer.content}

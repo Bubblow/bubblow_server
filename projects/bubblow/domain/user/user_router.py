@@ -9,13 +9,14 @@ from datetime import datetime, timedelta
 from typing import Union
 from domain.user import user_schema, user_crud
 
-from fastapi.security import OAuth2PasswordRequestForm
-from jose import jwt
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from jose import jwt, JWTError
 
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 app = APIRouter(
     prefix="/user"
@@ -31,7 +32,6 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-
 @app.post(path="/signup")
 async def signup(new_user: user_schema.NewUserForm, db: Session = Depends(get_db)):
     
@@ -44,8 +44,6 @@ async def signup(new_user: user_schema.NewUserForm, db: Session = Depends(get_db
     user_crud.create_user(new_user, db)    
     
     return {"detail": "Signup successful"}
-
-
 
 @app.post(path="/login")
 async def login(response: Response, login_form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
@@ -73,3 +71,21 @@ async def logout(response: Response, request: Request):
     response.delete_cookie(key="access_token")
     return HTTPException(status_code=status.HTTP_200_OK, detail="Logout successful")
 
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    else:
+        user = user_crud.get_user(username=username, db=db)
+        if user is None:
+            raise credentials_exception
+        return user
