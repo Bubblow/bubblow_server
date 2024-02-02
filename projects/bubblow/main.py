@@ -7,6 +7,7 @@ models.Base.metadata.create_all(bind=engine)
 from fastapi.middleware.cors import CORSMiddleware
 from domain.question import question_router
 from domain.user import user_router
+from domain.post import post_router
 
 app = FastAPI()
 app.add_middleware(
@@ -19,3 +20,4 @@ app.add_middleware(
 
 app.include_router(question_router.app, tags=['question'])
 app.include_router(user_router.app, tags=['user'])
+app.include_router(post_router.app, tags=['post'])
