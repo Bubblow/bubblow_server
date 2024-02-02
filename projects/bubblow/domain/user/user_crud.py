@@ -10,6 +10,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def get_user(username: str, db: Session):
     return db.query(User).filter(User.username == username).first()
 
+def email_user(email: str, db: Session):
+    return db.query(User).filter(User.email == email).first()
+
 def create_user(new_user: NewUserForm, db: Session):
     user = User(
         username=new_user.name,

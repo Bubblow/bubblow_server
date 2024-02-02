@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 
 from models import Question
-from domain.question.question_schema import Link
 from datetime import datetime
 from feature import Feature
 

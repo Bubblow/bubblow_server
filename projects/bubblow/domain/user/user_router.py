@@ -35,14 +35,16 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 @app.post(path="/signup")
 async def signup(new_user: user_schema.NewUserForm, db: Session = Depends(get_db)):
     
-    user = user_crud.get_user(new_user.email, db)
+    username_exists = user_crud.get_user(new_user.name, db)
+    email_exists = user_crud.email_user(new_user.email, db)
     
-    if user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
+    if username_exists or email_exists:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username or email already exists")
     
     user_crud.create_user(new_user, db)    
-        
-    return HTTPException(status_code=status.HTTP_200_OK, detail="Signup successful")
+    
+    return {"detail": "Signup successful"}
+
 
 
 @app.post(path="/login")
