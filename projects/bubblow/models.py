@@ -11,6 +11,8 @@ class Question(Base):
     link=Column(String, nullable=False)
     content=Column(Text, nullable=False)
     create_date=Column(DateTime, nullable=False, default=datetime.now)
+    user_id=Column(Integer, ForeignKey("user.id"), nullable=False)
+    user=relationship("User", backref="question_users")
 
 class User(Base):
     __tablename__ = "user"
