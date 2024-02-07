@@ -2,25 +2,25 @@
 
 파이썬 프레임워크 **FastAPI**를 사용, 각 실행 환경에 맞는 가상환경(`venv`)을 사용
 
-## 1. 바탕 화면에 '버블로우 서버' 폴더 만들기
+#### 1. 바탕 화면에 '버블로우 서버' 폴더 만들기
 
-## 2. git clone 하기
+#### 2. git clone 하기
 ```bash
 git clone https://github.com/Bubblow/bubblow_server.git
 ```
 
-## 3. Python 설치 확인
+#### 3. Python 설치 확인
 ```bash
 python3 -V
 ```
 
-## 4. 가상환경 생성
+#### 4. 가상환경 생성
 Bash에서 다음 명령어 실행:
 ```bash
 python -m venv venv
 ```
 
-## 5. 가상환경 활성화
+#### 5. 가상환경 활성화
 - 맥:
 ```bash
 source venv/bin/activate
@@ -30,8 +30,8 @@ source venv/bin/activate
 source venv/Scripts/activate
 ```
 
-## 6. 신뢰도 알고리즘에 필요한 라이브러리 설치
-### 6.1 py-hanspell (파이썬 맞춤법 검사 라이브러리)
+#### 6. 신뢰도 알고리즘에 필요한 라이브러리 설치
+#### 6.1 py-hanspell (파이썬 맞춤법 검사 라이브러리)
 ```bash
 git clone https://github.com/ssut/py-hanspell.git
 cd py-hanspell
@@ -113,7 +113,7 @@ def check(text):
     # 코드의 나머지 부분...
 ```
 
-### 6.2 형태소 분석기 Mecab 설치
+#### 6.2 형태소 분석기 Mecab 설치
 ```bash
 cd .. 
 git clone https://github.com/SOMJANG/Mecab-ko-for-Google-Colab.git
@@ -121,14 +121,14 @@ cd Mecab-ko-for-Google-Colab
 bash install_mecab-ko_on_colab_light_220429.sh
 ```
 
-## 7. 그 외에 필요한 패키지 설치
+#### 7. 그 외에 필요한 패키지 설치
 ```bash
 cd ..
 cd bubblow_server/projects/bubblow
 pip install -r requirements.txt
 ```
 
-#### (참고) 라이브러리 테스트 코드
+(참고) 라이브러리 테스트 코드
 ```python
 #haspell test code
 from hanspell import spell_checker
