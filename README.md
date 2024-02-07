@@ -128,6 +128,14 @@ cd bubblow_server/projects/bubblow
 pip install -r requirements.txt
 ```
 
+
+#### 8. fastapi 실행
+```bash
+uvicorn main:app --reload
+```
+
+끝‼️
+
 (참고) 라이브러리 테스트 코드
 ```python
 #haspell test code
