@@ -85,8 +85,8 @@ def check(text):
     if len(text) > 500:
         return Checked(result=False)
 
-    payload = { 'passportKey': '99b586dc83b64322687afd8b3a9dfdf1f7954954'
-    , '_callback': 'jQuery1124048624470935687203_1707238779103'
+    payload = { 'passportKey': '3bdf5febb0bbb30cefd2ad8002120855d2e3f3d9'
+    , '_callback': 'jQuery1124031625577338383715_1708913435770'
     , 'q': text, 'color_blindness': '0' }
 
     headers = {
