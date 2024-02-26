@@ -2,11 +2,12 @@ import os
 from dotenv import load_dotenv
 
 from sqlalchemy.orm import Session
-from database import get_db
+from database import get_db 
 
-from fastapi import APIRouter, Depends, status, HTTPException, Response, Request
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from datetime import datetime, timedelta
 from typing import Union
+
 from domain.user import user_schema, user_crud
 
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
@@ -16,76 +17,64 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
-app = APIRouter(
-    prefix="/user"
-)
+app = APIRouter(prefix="/user")
 
+# 액세스 토큰 생성 함수
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-@app.post(path="/signup")
+# 회원가입 엔드포인트
+@app.post("/signup")
 async def signup(new_user: user_schema.NewUserForm, db: Session = Depends(get_db)):
+    if user_crud.email_user(new_user.email, db):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="email already exists")
     
+    # 닉네임 중복 검사
     username_exists = user_crud.get_user(new_user.name, db)
-    email_exists = user_crud.email_user(new_user.email, db)
-    
-    if username_exists or email_exists:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username or email already exists")
+    if username_exists:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username already exists")
     
     user_crud.create_user(new_user, db)    
-    
     return {"detail": "Signup successful"}
 
-@app.post(path="/login")
-async def login(response: Response, login_form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = user_crud.get_user(login_form.username, db)
+# 로그인 엔드포인트
+@app.post("/login")
+async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = user_crud.email_user(form_data.username, db)  # form_data.username에 이메일 값
+    if not user or not user_crud.verify_password(form_data.password, user.password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
     
-    if not user:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid user or password")
-    
-    res = user_crud.verify_password(login_form.password, user.password)
-    
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
-    
-    response.set_cookie(key="access_token", value=access_token, expires=access_token_expires, httponly=True)
-    
-    if not res:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid user or password")
-    
+    access_token = create_access_token(
+        data={"sub": user.email},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    response.set_cookie(key="access_token", value=access_token, httponly=True, expires=ACCESS_TOKEN_EXPIRE_MINUTES * 60)
     return user_schema.Token(access_token=access_token, token_type="bearer")
 
-@app.get(path="/logout")
-async def logout(response: Response, request: Request):
-    access_token=request.cookies.get("access_token")
-    
+# 로그아웃 엔드포인트
+@app.get("/logout")
+async def logout(response: Response):
     response.delete_cookie(key="access_token")
-    return HTTPException(status_code=status.HTTP_200_OK, detail="Logout successful")
+    return {"detail": "Logout successful"}
 
+#현재 유저 정보 확인 함수
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-    else:
-        user = user_crud.get_user(username=username, db=db)
+        user_email: str = payload.get("sub")
+        if user_email is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+        
+        user = user_crud.email_user(user_email, db)
+        
         if user is None:
-            raise credentials_exception
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
         return user
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")

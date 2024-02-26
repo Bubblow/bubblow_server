@@ -4,16 +4,6 @@ from datetime import datetime
 
 from database import Base
 
-class Question(Base):
-    __tablename__ = "question"
-    
-    id=Column(Integer, primary_key=True, autoincrement=True)
-    link=Column(String, nullable=False)
-    content=Column(Text, nullable=False)
-    create_date=Column(DateTime, nullable=False, default=datetime.now)
-    user_id=Column(Integer, ForeignKey("user.id"), nullable=False)
-    user=relationship("User", backref="question_users")
-
 class User(Base):
     __tablename__ = "user"
     
@@ -22,9 +12,22 @@ class User(Base):
     password = Column(VARCHAR(100), nullable=False)
     email = Column(VARCHAR(100), unique=True, nullable=False)
     
-class Post(Base):
-	__tablename__="post"
+class NewsLink(Base):
+    __tablename__ = "news_links"
 
-	id = Column(Integer, primary_key=True, autoincrement=True)
-	title=Column(String, nullable=False)
-	content=Column(Text, nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    link = Column(String, nullable=False)
+    analysis_result = Column(Text, nullable=True)  # 분석 결과, JSON 형식의 문자열로 저장
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user = relationship("User", backref="news_links")  # User 모델과의 관계 설정
+    create_at = Column(DateTime, nullable=False, default=datetime.now)
+
+class FeedBack(Base):
+    __tablename__ = "feedback"
+    
+    id = Column(Integer, primary_key=True)
+    score = Column(Integer, nullable=False)
+    content = Column(Text, nullable=False)
+    create_at = Column(DateTime, nullable=False, default=datetime.now)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user = relationship("User", backref="feedback")

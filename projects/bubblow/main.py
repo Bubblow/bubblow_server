@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from domain.question import question_router
 from domain.user import user_router
 from domain.mypage import mypage_router
+from domain.feedback import feedback_router
 
 app = FastAPI()
 app.add_middleware(
@@ -21,3 +22,4 @@ app.add_middleware(
 app.include_router(user_router.app, tags=['user'])
 app.include_router(question_router.app, tags=['question'])
 app.include_router(mypage_router.app, tags=['mypage'])
+app.include_router(feedback_router.app, tags=['feedback'])

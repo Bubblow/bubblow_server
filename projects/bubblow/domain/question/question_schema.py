@@ -1,10 +1,5 @@
 from pydantic import BaseModel
-
-class Link(BaseModel):
+import datetime
+class NewsLinkSchema(BaseModel):
     link: str
-    class Config:
-        orm_mode = True
-        
-
-class answers(BaseModel):
-    content: str
+    create_at: datetime.datetime

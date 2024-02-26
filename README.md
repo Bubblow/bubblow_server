@@ -35,7 +35,6 @@ source venv/Scripts/activate
 ```bash
 git clone https://github.com/ssut/py-hanspell.git
 cd py-hanspell
-python setup.py install
 ```
 
 #### 6.1.1 `py-hanspell` 폴더 안에 > `hanspell` 폴더 안에 > `spell_checker.py` 파일 수정
@@ -111,6 +110,10 @@ def check(text):
     }
 
     # 코드의 나머지 부분...
+```
+#### 6.1.2 py-hanspell 설치
+```bash
+python setup.py install
 ```
 
 #### 6.2 형태소 분석기 Mecab 설치
