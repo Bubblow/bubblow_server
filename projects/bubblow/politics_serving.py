@@ -8,8 +8,8 @@ from typing import List
 app = FastAPI()
 
 # 모델 및 TF-IDF 변환기 로드
-model = joblib.load('./politics_model/lgbm_model.joblib')
-tfidf_vectorizer = joblib.load('./politics_model/tfidf_vectorizer.joblib')
+model = joblib.load('lgbm_model.joblib')
+tfidf_vectorizer = joblib.load('tfidf_vectorizer.joblib')
 
 # 데이터를 받기 위한 Pydantic 모델 정의
 class Item(BaseModel):
@@ -23,6 +23,7 @@ async def predict(item: Item):
     
     # 모델 예측
     prediction = model.predict(data_tfidf)
+    probabilities = model.predict_proba(data_tfidf).tolist()[0]
     
-    # 예측 결과 반환
-    return {"prediction": prediction.tolist()}
+    # 예측 결과와 예측 확률 반환
+    return {"prediction": prediction.tolist(), "probabilities": probabilities}
