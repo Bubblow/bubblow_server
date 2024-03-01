@@ -38,37 +38,12 @@ cd py-hanspell
 ```
 
 #### 6.1.1 `py-hanspell` 폴더 안에 > `hanspell` 폴더 안에 > `spell_checker.py` 파일 수정
-아래 코드로 복붙
+아래 코드로 def check 함수 수정
 ```python
 # -*- coding: utf-8 -*-
 """
 Python용 한글 맞춤법 검사 모듈
 """
-import re
-import requests
-import json
-import time
-import sys
-from collections import OrderedDict
-import xml.etree.ElementTree as ET
-
-from . import __version__
-from .response import Checked
-from .constants import base_url
-from .constants import CheckResult
-
-_agent = requests.Session()
-PY3 = sys.version_info[0] == 3
-
-def _remove_tags(text):
-    text = u'<content>{}</content>'.format(text).replace('<br>','')
-    if not PY3:
-        text = text.encode('utf-8')
-
-    result = ''.join(ET.fromstring(text).itertext())
-
-    return result
-
 def check(text):
     """
     매개변수로 입력받은 한글 문장의 맞춤법을 체크합니다.
@@ -84,8 +59,8 @@ def check(text):
     if len(text) > 500:
         return Checked(result=False)
 
-    payload = { 'passportKey': '3bdf5febb0bbb30cefd2ad8002120855d2e3f3d9'
-    , '_callback': 'jQuery1124031625577338383715_1708913435770'
+    payload = { 'passportKey': 'f727f097f7d41da7ac664ae6041bb00afd3d5af5'
+    , '_callback': 'jQuery1124010479246828164901_1709258162093'
     , 'q': text, 'color_blindness': '0' }
 
     headers = {
@@ -108,7 +83,6 @@ def check(text):
         'time': passed_time,
         'words': OrderedDict(),
     }
-
     # 코드의 나머지 부분...
 ```
 #### 6.1.2 py-hanspell 설치
@@ -127,13 +101,13 @@ bash install_mecab-ko_on_colab_light_220429.sh
 #### 7. 그 외에 필요한 패키지 설치
 ```bash
 cd ..
-cd bubblow_server/projects/bubblow
 pip install -r requirements.txt
 ```
 
 
 #### 8. fastapi 실행
 ```bash
+cd projects/bubblow
 uvicorn main:app --reload
 ```
 
