@@ -1,16 +1,23 @@
-from sqlalchemy import Column, Integer, String, DateTime, VARCHAR, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, DateTime, VARCHAR, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from database import Base
 
 class User(Base):
     __tablename__ = "user"
-    
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username=Column(VARCHAR(10), unique=True, nullable=False)
+    username = Column(VARCHAR(10), unique=True, nullable=False)
     password = Column(VARCHAR(100), nullable=False)
     email = Column(VARCHAR(100), unique=True, nullable=False)
+    is_verified = Column(Boolean, default=False)  # 이메일 인증 상태
+    verification_code = Column(VARCHAR(100), nullable=True)  # 이메일 인증 코드
+    verification_code_expires_at = Column(DateTime, nullable=True)  # 인증 코드 만료 시간
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # 이메일 인증 코드 생성 시, 만료 시간
+        self.verification_code_expires_at = datetime.utcnow() + timedelta(hours=1)
     
 class NewsLink(Base):
     __tablename__ = "news_links"
