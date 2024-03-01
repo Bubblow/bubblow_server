@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 from sqlalchemy.orm import Session
 from database import get_db 
+from models import User
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from datetime import datetime, timedelta
@@ -78,3 +79,21 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         return user
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
+    
+    
+@app.post("/verify_email")
+async def verify_email(request_body: user_schema.SendEmail, db: Session = Depends(get_db)):
+    email = request_body.email
+    verification_code = request_body.verification_code
+    print(email)
+    print(verification_code)
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.verification_code != verification_code or datetime.utcnow() > user.verification_code_expires_at:
+        raise HTTPException(status_code=400, detail="Invalid or expired verification code")
+    
+    user.is_verified = True
+    db.commit()
+    return {"detail": "Email verified successfully"}
