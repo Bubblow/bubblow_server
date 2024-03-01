@@ -112,7 +112,7 @@ alembic upgrade head
 ```
 
 #### 10. .env 파일 생성하기
-progects랑 동일한 위치에 .env파일 만들기
+projects랑 동일한 위치에 .env파일 만들기
 자세한 코드는 노션 참고
 
 #### 11. 로컬 위치 수정
