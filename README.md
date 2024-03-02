@@ -104,8 +104,25 @@ cd ..
 pip install -r requirements.txt
 ```
 
+#### 9. DB migration 하기
+```bash
+alembic init alembic
+alembic revision --autogenerate
+alembic upgrade head
+```
 
-#### 8. fastapi 실행
+#### 10. .env 파일 생성하기
+projects랑 동일한 위치에 .env파일 만들기
+자세한 코드는 노션 참고
+
+#### 11. 로컬 위치 수정
+projects > bubblow > domain > question > question_crud.py에서 아래 코드를 로컬에 맞춰서 수정한다
+```bash
+sys.path.append('/Users/hansol/desktop (2)/Bubblow/nt-worker')
+# '/Users/hansol/desktop (2)/Bubblow/nt-worker'은 내 로컬에서 nt-worker가 현재 위치한 path이다
+```
+
+#### 12. fastapi 실행
 ```bash
 cd projects/bubblow
 uvicorn main:app --reload

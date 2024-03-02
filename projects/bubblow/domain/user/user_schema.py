@@ -36,3 +36,11 @@ class NewUserForm(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class EmailRecipient(BaseModel):
+    email: EmailStr
+    name: str
+
+class SendEmail(BaseModel):
+    email: EmailStr
+    verification_code: str

@@ -26,8 +26,6 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
-alembic/
-alembic.ini
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -111,3 +109,4 @@ venv.bak/
 
 Mecab-ko-for-Google-Colab/
 py-hanspell/
+LightGBM/
