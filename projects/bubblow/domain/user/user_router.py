@@ -80,13 +80,12 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
     
-    
+#인증번호 확인
 @app.post("/verify_email")
 async def verify_email(request_body: user_schema.SendEmail, db: Session = Depends(get_db)):
     email = request_body.email
     verification_code = request_body.verification_code
-    print(email)
-    print(verification_code)
+
     user = db.query(User).filter(User.email == email).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -97,3 +96,24 @@ async def verify_email(request_body: user_schema.SendEmail, db: Session = Depend
     user.is_verified = True
     db.commit()
     return {"detail": "Email verified successfully"}
+
+#비밀번호 변경
+@app.put("/edit_password", status_code=status.HTTP_202_ACCEPTED)
+async def edit(password: user_schema.EditPassword, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    user_crud.edit_password(db, current_user=current_user, password_update=password)
+    return {"message": "Password updated successfully"}
+
+#회원 탈퇴
+@app.delete("/delete")
+async def delete(db: Session=Depends(get_db), current_user: User = Depends(get_current_user)):
+    Response.delete_cookie(key="access_token")
+    return user_crud.delete_user(db, current_user)
+
+#비밀번호 찾기
+@app.post("/find_password")
+async def find(request_body: user_schema.FindEmail, db: Session = Depends(get_db)):
+    return user_crud.find_password(db, email=request_body)
+
+@app.post("/reset_password")
+async def reset_password(request: user_schema.ResetPassword, db: Session = Depends(get_db)):
+    return user_crud.reset_password(db, request)

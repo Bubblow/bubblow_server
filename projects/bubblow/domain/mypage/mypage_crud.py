@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from models import NewsLink, User
 from sqlalchemy import desc
 from feature import Feature
+from domain.mypage.mypage_schema import NicknameUpdate
 
 def record(db: Session, current_user: User):
     records = db.query(NewsLink.link, NewsLink.analysis_result).filter(NewsLink.user == current_user).order_by(desc(NewsLink.id)).limit(5).all()
@@ -31,3 +32,9 @@ def record(db: Session, current_user: User):
 #기사내용 35글자까지 저장하는 함수
 def getFirstChars(text):
     return text[:35]
+
+#닉네임 수정
+def edit_nickname(db: Session, current_user: User, nickname_update: NicknameUpdate):
+    current_user.username = nickname_update.username
+    db.add(current_user)
+    db.commit()

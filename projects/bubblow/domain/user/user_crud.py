@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
+
 from models import User
-from domain.user.user_schema import NewUserForm
+from domain.user.user_schema import NewUserForm, EditPassword, FindEmail, ResetPassword
 from passlib.context import CryptContext
 import secrets
 from datetime import datetime, timedelta
@@ -65,3 +67,47 @@ def send_verification_email(email_to: str, verification_code: str):
     text = msg.as_string()
     server.sendmail(email_from, email_to, text)
     server.quit()
+    
+#마이페이지에서 비밀번호 변경
+def edit_password(db: Session, current_user: User, password_update: EditPassword):
+    if not pwd_context.verify(password_update.current_password, current_user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password"
+        )
+    # 새 비밀번호로 업데이트
+    current_user.password = pwd_context.hash(password_update.new_password)
+    db.add(current_user)
+    db.commit()
+
+#회원탈퇴
+def delete_user(db: Session, current_user: User):
+    db.delete(current_user)
+    db.commit()
+    
+#비밀번호 찾기
+def find_password(db: Session, email: FindEmail):
+    user = db.query(User).filter(User.email == email.email).first()
+    if not user:
+        return {"message": "User not found."}
+    
+    verification_code = secrets.randbelow(1000000)
+    user.verification_code = verification_code
+    user.verification_code_expires_at = datetime.utcnow() + timedelta(hours=1)
+    db.commit()
+
+    send_verification_email(email.email, verification_code)
+    
+    return {"message": "A password reset code has been sent if the email is registered."}
+
+#새로운 비밀번호
+def reset_password(db: Session, reset_password_data: ResetPassword):
+    user = db.query(User).filter(User.email == reset_password_data.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    
+    # 새 비밀번호로 업데이트
+    user.password = pwd_context.hash(reset_password_data.new_password)
+    db.commit()
+
+    return {"message": "Your password has been reset successfully."}
