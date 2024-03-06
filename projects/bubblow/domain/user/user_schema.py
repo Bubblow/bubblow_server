@@ -37,10 +37,47 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-class EmailRecipient(BaseModel):
-    email: EmailStr
-    name: str
-
 class SendEmail(BaseModel):
     email: EmailStr
     verification_code: str
+
+class FindEmail(BaseModel):
+    email: EmailStr
+
+class EditPassword(BaseModel):
+    current_password: str
+    new_password: str
+    
+    @validator('new_password')
+    def validate_password(cls, v, values, **kwargs):
+        errors = []
+        if len(v) < 8:
+            errors.append("비밀번호는 8자리 이상이어야 합니다.")
+        if not any(char.isdigit() for char in v):
+            errors.append("비밀번호에는 최소 한 자리의 숫자가 포함되어야 합니다.")
+        if not any(char.isalpha() for char in v):
+            errors.append("비밀번호에는 최소 한 자리의 영문자가 포함되어야 합니다.")
+
+        if errors:
+            raise HTTPException(status_code=422, detail=" ".join(errors))
+
+        return v
+
+class ResetPassword(BaseModel):
+    email: EmailStr
+    new_password: str
+    
+    @validator('new_password')
+    def validate_password(cls, v, values, **kwargs):
+        errors = []
+        if len(v) < 8:
+            errors.append("비밀번호는 8자리 이상이어야 합니다.")
+        if not any(char.isdigit() for char in v):
+            errors.append("비밀번호에는 최소 한 자리의 숫자가 포함되어야 합니다.")
+        if not any(char.isalpha() for char in v):
+            errors.append("비밀번호에는 최소 한 자리의 영문자가 포함되어야 합니다.")
+
+        if errors:
+            raise HTTPException(status_code=422, detail=" ".join(errors))
+
+        return v
