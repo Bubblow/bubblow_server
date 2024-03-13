@@ -41,53 +41,13 @@ cd py-hanspell
 #### 6.1.1 `py-hanspell` 폴더 안에 > `hanspell` 폴더 안에 > `spell_checker.py` 파일 수정
 아래 코드로 def check 함수 수정
 ```python
-# -*- coding: utf-8 -*-
-"""
-Python용 한글 맞춤법 검사 모듈
-"""
-def check(text):
-    """
-    매개변수로 입력받은 한글 문장의 맞춤법을 체크합니다.
-    """
-    if isinstance(text, list):
-        result = []
-        for item in text:
-            checked = check(item)
-            result.append(checked)
-        return result
-
-    # 최대 500자까지 가능.
-    if len(text) > 500:
-        return Checked(result=False)
-
-    payload = { 'passportKey': 'f727f097f7d41da7ac664ae6041bb00afd3d5af5'
-    , '_callback': 'jQuery1124010479246828164901_1709258162093'
+    payload = { 'passportKey': '0103527cc78df4354dae796239716c5bd2417cd6'
+    , '_callback': 'jQuery112406967053878796103_1710292798358'
     , 'q': text, 'color_blindness': '0' }
-
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
-        'referer': 'https://search.naver.com/',
-    }
-
-    start_time = time.time()
-    r = _agent.get(base_url, params=payload, headers=headers)
-    passed_time = time.time() - start_time
-
-    json_data = re.search(r'\((.*)\)', r.text).group(1)
-    data = json.loads(json_data)
-    html = data['message']['result']['html']
-    result = {
-        'result': True,
-        'original': text,
-        'checked': _remove_tags(html),
-        'errors': data['message']['result']['errata_count'],
-        'time': passed_time,
-        'words': OrderedDict(),
-    }
-    # 코드의 나머지 부분...
 ```
 #### 6.1.2 py-hanspell 설치
 ```bash
+pip install setuptools
 python setup.py install
 ```
 
@@ -102,12 +62,15 @@ bash install_mecab-ko_on_colab_light_220429.sh
 #### 7. 그 외에 필요한 패키지 설치
 ```bash
 cd ..
+cd projects/bubblow
 pip install -r requirements.txt
 ```
 
 #### 9. DB migration 하기
 ```bash
-alembic init alembic
+alembic init migrations
+
+sqlalchemy.url = #변경
 alembic revision --autogenerate
 alembic upgrade head
 ```
@@ -125,8 +88,8 @@ sys.path.append('/Users/hansol/desktop (2)/Bubblow/nt-worker')
 
 #### 12. fastapi 실행
 ```bash
-cd projects/bubblow
 uvicorn main:app --reload
+# http://127.0.0.1:8000/docs에 접속하면 api 테스트 가능
 ```
 
 끝‼️
