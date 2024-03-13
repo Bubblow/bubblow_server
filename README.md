@@ -17,6 +17,7 @@ python3 -V
 #### 4. 가상환경 생성
 Bash에서 다음 명령어 실행:
 ```bash
+cd bubblow_server/
 python -m venv venv
 ```
 
