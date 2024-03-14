@@ -1,18 +1,24 @@
-import os
+import os, shutil
 from dotenv import load_dotenv
 
 from sqlalchemy.orm import Session
 from database import get_db 
 from models import User
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status, File, UploadFile
 from datetime import datetime, timedelta
 from typing import Union
-
-from domain.user import user_schema, user_crud
-
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
+
+from domain.user import user_schema, user_crud
+from pathlib import Path
+# user_router.py 가 위치한 디렉토리의 상위 폴더를 기준으로 images 폴더 경로를 설정
+images_path = Path(__file__).parent.parent / "images"
+# 기본 이미지 경로 설정
+default_image_path = images_path / "bubblow_image.webp"
+
+
 
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -33,13 +39,24 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 # 회원가입 엔드포인트
 @app.post("/signup")
 async def signup(new_user: user_schema.NewUserForm, db: Session = Depends(get_db)):
+    
     if user_crud.email_user(new_user.email, db):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="email already exists")
-    
     # 닉네임 중복 검사
     username_exists = user_crud.get_user(new_user.name, db)
     if username_exists:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username already exists")
+    
+    if new_user.profile:
+        file_location = images_path / new_user.profile.filename
+        with open(file_location, "wb+") as file_object:
+            shutil.copyfileobj(new_user.profile.file, file_object)
+        profile_image_path = str(file_location)
+    else:
+        # 기본 이미지 사용
+        profile_image_path = str(default_image_path)
+
+    
     
     user_crud.create_user(new_user, db)    
     return {"detail": "Signup successful"}

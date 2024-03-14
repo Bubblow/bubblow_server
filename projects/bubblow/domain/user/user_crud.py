@@ -36,7 +36,8 @@ def create_user(new_user: NewUserForm, db: Session):
         email=new_user.email,
         password=hashed_password,
         verification_code=verification_code,
-        verification_code_expires_at=datetime.utcnow() + timedelta(hours=1)  # 인증 코드 만료 시간 설정
+        verification_code_expires_at=datetime.utcnow() + timedelta(hours=1),  # 인증 코드 만료 시간 설정
+        profile_image_path=new_user.profile
     )
     db.add(user)
     db.commit()

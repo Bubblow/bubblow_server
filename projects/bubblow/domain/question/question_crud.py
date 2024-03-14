@@ -6,7 +6,7 @@ from feature import Feature
 from sqlalchemy import desc
 
 import sys, json
-sys.path.append(r'C:\Users\서아영\Desktop\버블로우서버\bubblow_server\projects\nt-worker')
+sys.path.append('/Users/hansol/desktop (2)/Bubblow/nt-worker')
 from Analysis.AnalysisContents import AnalysisContent
 from Analysis.AnalysisContents import AnalysisContent
 from Analysis.AnalysisTitle import AnalysisTitle
