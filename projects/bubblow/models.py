@@ -13,6 +13,7 @@ class User(Base):
     is_verified = Column(Boolean, default=False)  # 이메일 인증 상태
     verification_code = Column(VARCHAR(100), nullable=True)  # 이메일 인증 코드
     verification_code_expires_at = Column(DateTime, nullable=True)  # 인증 코드 만료 시간
+    profile_image_path = Column(String, nullable=True)  # 프로필 이미지 파일 경로
     news_links = relationship("NewsLink", backref="user", cascade="all, delete, delete-orphan")
     feedback = relationship("FeedBack", backref="user")
 

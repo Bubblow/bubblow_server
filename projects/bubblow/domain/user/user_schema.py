@@ -1,10 +1,11 @@
 from pydantic import BaseModel, EmailStr, validator
-from fastapi import HTTPException
+from fastapi import HTTPException, File, UploadFile
 
 class NewUserForm(BaseModel):
     email: EmailStr
     name: str
     password: str
+    profile: UploadFile = File(None)
 
     @validator('email', 'name', 'password', pre=True)
     def check_empty(cls, v):
