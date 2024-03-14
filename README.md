@@ -106,6 +106,15 @@ uvicorn main:app --reload
 # http://127.0.0.1:8000/docs에 접속하면 api 테스트 가능
 ```
 
+#### (참고) DB 초기화 하는법
+```bash
+rm -r migrations
+rm alembic.ini
+alembic init migrations
+alembic revision —autogenerate
+alembic upgrade head
+```
+
 끝‼️
 
 (참고) 라이브러리 테스트 코드
