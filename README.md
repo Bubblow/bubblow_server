@@ -67,12 +67,26 @@ pip install -r requirements.txt
 ```
 
 #### 9. DB migration 하기
+
 ```bash
 alembic init migrations
+(... 생략 ...)
+```
 
-sqlalchemy.url = #변경
+projects > bubblow > alembic.ini 파일 안에서 > sqlalchemy.url  = 노션 보고 변경
+</br>
+migrations > env.py 아래와 같이 수정 및 추가
+
+```bash
+import models
+target_metadata = models.Base.metadata
+(... 생략 ...)
+```
+터미널에 마저 실행
+```bash
 alembic revision --autogenerate
 alembic upgrade head
+(... 생략 ...)
 ```
 
 #### 10. .env 파일 생성하기
