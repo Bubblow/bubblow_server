@@ -26,8 +26,9 @@ def record(db: Session, current_user: User):
 
     email = current_user.email
     username = current_user.username
+    profile = current_user.profile_image_path
 
-    return {'email': email, "username": username, "results": results}
+    return {'email': email, "username": username, "profile": profile , "results": results}
 
 #기사내용 35글자까지 저장하는 함수
 def getFirstChars(text):

@@ -15,7 +15,7 @@ class User(Base):
     verification_code_expires_at = Column(DateTime, nullable=True)  # 인증 코드 만료 시간
     profile_image_path = Column(String, nullable=True)  # 프로필 이미지 파일 경로
     news_links = relationship("NewsLink", backref="user", cascade="all, delete, delete-orphan")
-    feedback = relationship("FeedBack", backref="user")
+    feedback = relationship("FeedBack", backref="user", cascade="all, delete, delete-orphan")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

@@ -1,4 +1,4 @@
-import os, shutil
+import os
 from dotenv import load_dotenv
 
 from sqlalchemy.orm import Session
@@ -10,15 +10,7 @@ from datetime import datetime, timedelta
 from typing import Union
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
-
 from domain.user import user_schema, user_crud
-from pathlib import Path
-# user_router.py 가 위치한 디렉토리의 상위 폴더를 기준으로 images 폴더 경로를 설정
-images_path = Path(__file__).parent.parent / "images"
-# 기본 이미지 경로 설정
-default_image_path = images_path / "bubblow_image.webp"
-
-
 
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -46,18 +38,7 @@ async def signup(new_user: user_schema.NewUserForm, db: Session = Depends(get_db
     username_exists = user_crud.get_user(new_user.name, db)
     if username_exists:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username already exists")
-    
-    if new_user.profile:
-        file_location = images_path / new_user.profile.filename
-        with open(file_location, "wb+") as file_object:
-            shutil.copyfileobj(new_user.profile.file, file_object)
-        profile_image_path = str(file_location)
-    else:
-        # 기본 이미지 사용
-        profile_image_path = str(default_image_path)
 
-    
-    
     user_crud.create_user(new_user, db)    
     return {"detail": "Signup successful"}
 
@@ -122,9 +103,10 @@ async def edit(password: user_schema.EditPassword, db: Session = Depends(get_db)
 
 #회원 탈퇴
 @app.delete("/delete")
-async def delete(db: Session=Depends(get_db), current_user: User = Depends(get_current_user)):
-    Response.delete_cookie(key="access_token")
-    return user_crud.delete_user(db, current_user)
+async def delete(response: Response, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    response.delete_cookie(key="access_token")
+    user_crud.delete_user(db, current_user)
+    return {"message": "계정이 삭제되었습니다. 쿠키가 삭제되었습니다."}
 
 #비밀번호 찾기
 @app.post("/find_password")
