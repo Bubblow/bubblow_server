@@ -50,13 +50,13 @@ def read_link(db: Session):
         newsBuffer = Feature(link.link)
         title = newsBuffer[0]['title']
         content = getFirstChars(newsBuffer[0]['content'])
-        # image_url = newsBuffer[0].get('image_url', '')
+        image_url = newsBuffer[0].get('image_url', '')
         
         results.append({
             "link": link.link,
             "title": title,
             "content": content,
-            # "image_url": image_url,
+            "image_url": image_url,
         })
     return results
 
