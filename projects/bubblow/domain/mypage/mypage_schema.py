@@ -5,6 +5,7 @@ class Recode(BaseModel):
     result: str
     email: EmailStr
     username: str
+    profile: str
 
 class NicknameUpdate(BaseModel):
     username: str

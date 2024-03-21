@@ -6,7 +6,8 @@ from domain.user.user_schema import NewUserForm, EditPassword, FindEmail, ResetP
 from passlib.context import CryptContext
 import secrets
 from datetime import datetime, timedelta
-import os
+import os, shutil
+from pathlib import Path
 from dotenv import load_dotenv
 import smtplib
 from email.mime.text import MIMEText
@@ -37,7 +38,7 @@ def create_user(new_user: NewUserForm, db: Session):
         password=hashed_password,
         verification_code=verification_code,
         verification_code_expires_at=datetime.utcnow() + timedelta(hours=1),  # 인증 코드 만료 시간 설정
-        profile_image_path=new_user.profile
+        profile_image_path="/images/bubblow_image.jpeg"
     )
     db.add(user)
     db.commit()
