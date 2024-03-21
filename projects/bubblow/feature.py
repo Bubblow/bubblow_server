@@ -13,7 +13,6 @@ def Feature(news_link):
     news_contents =[]
 
     # 뉴스 제목 가져오기
-    # 뉴스 제목 가져오기
     title_element = soup.select_one('h2.media_end_head_headline')
     if title_element:
         title = title_element.get_text(strip=True)
@@ -21,6 +20,15 @@ def Feature(news_link):
         title_element = soup.select_one("#ct > div.media_end_head.go_trans > div.media_end_head_title > h2")
         title = title_element.get_text(strip=True) if title_element else None
 
+
+    #이미지 URL 가져오기
+    image_container = soup.select_one("span.end_photo_org")
+    if image_container:
+        image_element = image_container.find('img', class_='_LAZY_LOADING')
+        if image_element and 'data-src' in image_element.attrs:
+            image_url = image_element['data-src']
+        else:
+            image_url = None  # 이미지가 없거나 data-src 속성이 없는 경우
 
     # 뉴스 본문 가져오기
     content = soup.select("article#dic_area")
@@ -66,6 +74,7 @@ def Feature(news_link):
     # JSON 데이터로 변환
     news_data = {
         "title": news_titles[0] if news_titles else "",
+        "image_url": image_url,
         "content": news_contents[0].strip("[]")+ f"{byline}",
         "published_at": published_at,
         "provider": copyright_text if 'copyright_text' in locals() else "",

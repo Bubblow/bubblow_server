@@ -14,14 +14,14 @@ def record(db: Session, current_user: User):
         title = newsBuffer[0]['title']
         content = getFirstChars(newsBuffer[0]['content'])
         analysis_result = link[1]
-        # image_url = newsBuffer[0].get('image_url', '')
+        image_url = newsBuffer[0].get('image_url', '')
     
         results.append({
             "link": link.link,
             "title": title,
             "content": content,
-            "analysis_result": analysis_result
-            # "image_url": image_url,
+            "analysis_result": analysis_result,
+            "image_url": image_url,
         })
 
     email = current_user.email
