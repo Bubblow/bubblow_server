@@ -74,7 +74,7 @@ def Feature(news_link):
     # JSON 데이터로 변환
     news_data = {
         "title": news_titles[0] if news_titles else "",
-        "image_url": image_url,
+        "image_url": image_url if 'image_url' in locals() else "",
         "content": news_contents[0].strip("[]")+ f"{byline}",
         "published_at": published_at,
         "provider": copyright_text if 'copyright_text' in locals() else "",
