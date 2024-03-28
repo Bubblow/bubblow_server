@@ -27,7 +27,9 @@ class NewsLink(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     link = Column(String, nullable=False)
-    analysis_result = Column(Text, nullable=True)  # 분석 결과, JSON 형식의 문자열로 저장
+    analysis_result = Column(Text, nullable=False)  # 신뢰도 점수
+    politics=Column(Integer, nullable=False) # 정치 성향
+    economy=Column(Integer, nullable=False) #경제 성향
     create_at = Column(DateTime, nullable=False, default=datetime.now)
     user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
 
